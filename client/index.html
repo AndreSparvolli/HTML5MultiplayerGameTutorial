@@ -1,32 +1,59 @@
 <html>
     <body>
         <center>
-            <b>DUUUUUUUUUUUDE!!! =D</b>
+            <b>Multiplayer HTML5 Game Example</b>
         </center>
 
         <br/>
 
         <center>
-            <button onclick='happy()'>
-                Happy
-            </button>
+            <canvas id="ctx" width="500" height="500" style="border: 1px solid #000000;"></canvas>
         </center>
     </body>
 
     <script src='https://cdn.socket.io/socket.io-1.4.5.js'></script>
-    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js'></script>
 
     <script>
+        var KEY_UP    = 38;
+        var KEY_DOWN  = 40;
+        var KEY_LEFT  = 37;
+        var KEY_RIGHT = 39;
+        
+        var ctx = document.getElementById("ctx").getContext('2d');
+        ctx.font = '30px Arial';
+
         var socket = io();
 
-        var happy = function() {
-            socket.emit('happy', {
-                reason: ' because you suck!'
-            });
+        socket.on('newPositions', function(data) {
+            ctx.clearRect(0, 0, 500, 500);
+
+            for (var i = 0; i < data.length; i++) {
+                ctx.fillText('Mongol' + data[i].number, data[i].x, data[i].y);
+            }
+        });
+
+        document.onkeydown = function(event) {
+            if(event.keyCode === KEY_UP) {
+                socket.emit('keyPress',{inputId:'up',state:true});
+            } else if(event.keyCode === KEY_DOWN) {
+                socket.emit('keyPress',{inputId:'down',state:true});
+            } else if(event.keyCode === KEY_LEFT) {
+                socket.emit('keyPress',{inputId:'left',state:true});
+            } else if(event.keyCode === KEY_RIGHT) {
+                socket.emit('keyPress',{inputId:'right',state:true});
+            }
         }
 
-        socket.on('serverMsg', function(data) {
-            console.log(data.msg);
-        });
+        document.onkeyup = function(event) {
+            if(event.keyCode === KEY_UP) {
+                socket.emit('keyPress',{inputId:'up',state:false});
+            } else if(event.keyCode === KEY_DOWN) {
+                socket.emit('keyPress',{inputId:'down',state:false});
+            } else if(event.keyCode === KEY_LEFT) {
+                socket.emit('keyPress',{inputId:'left',state:false});
+            } else if(event.keyCode === KEY_RIGHT) {
+                socket.emit('keyPress',{inputId:'right',state:false});
+            }
+        }
     </script>
 </html>
